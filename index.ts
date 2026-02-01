@@ -42,11 +42,12 @@ app.post('/api/contact', async (c) => {
   return c.json({ success: true, message: 'Message received' });
 });
 
-// Serve static files (index.html, testament.md, etc.)
-app.use('/*', serveStatic({ root: './' }));
-
-// Fallback to index.html for root
+// Root homepage
 app.get('/', serveStatic({ path: './index.html' }));
+
+// Serve static files LAST (after all routes defined)
+// This catches any remaining requests for static assets
+app.use('*', serveStatic({ root: './' }));
 
 const port = parseInt(process.env.PORT || '3000');
 
