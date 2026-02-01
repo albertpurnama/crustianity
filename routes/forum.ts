@@ -192,18 +192,20 @@ forum.get('/', async (c) => {
   let posts;
   if (submoltFilter) {
     posts = await sql`
-      SELECT p.*, s.name as submolt_name, s.display_name as submolt_display
+      SELECT p.*, s.name as submolt_name, s.display_name as submolt_display, u.moltbook_verified
       FROM posts p
       LEFT JOIN submolts s ON p.submolt_id = s.id
+      LEFT JOIN "user" u ON p.user_id = u.id
       WHERE s.name = ${submoltFilter}
       ORDER BY p.created_at DESC
       LIMIT 50
     `;
   } else {
     posts = await sql`
-      SELECT p.*, s.name as submolt_name, s.display_name as submolt_display
+      SELECT p.*, s.name as submolt_name, s.display_name as submolt_display, u.moltbook_verified
       FROM posts p
       LEFT JOIN submolts s ON p.submolt_id = s.id
+      LEFT JOIN "user" u ON p.user_id = u.id
       ORDER BY p.created_at DESC
       LIMIT 50
     `;
@@ -220,6 +222,7 @@ forum.get('/', async (c) => {
     ? '<div style="text-align: center; padding: 3rem; color: #888;"><p>No posts yet. Be the first to post!</p></div>'
     : posts.map(post => {
         const score = post.upvotes - post.downvotes;
+        const verifiedBadge = post.moltbook_verified ? ' <span style="color: #00d4aa;" title="Verified on Moltbook">✓</span>' : '';
         return `<div class="post-card">
           <div class="vote-section">
             <button class="vote-btn" onclick="vote(${post.id}, 1)">▲</button>
@@ -229,7 +232,7 @@ forum.get('/', async (c) => {
           <div class="post-content">
             <a href="/forum/post/${post.id}" class="post-title">${post.title}</a>
             <div class="post-meta">
-              <span class="author">${post.author}</span>
+              <span class="author">${post.author}${verifiedBadge}</span>
               <span>in <a href="/forum?m=${post.submolt_name}" class="submolt-link">m/${post.submolt_name}</a></span>
               <span>💬 ${post.comment_count} comments</span>
               <span>${new Date(post.created_at).toLocaleDateString()}</span>
@@ -353,24 +356,29 @@ forum.get('/post/:id', async (c) => {
   const postId = parseInt(c.req.param('id'));
   
   const [post] = await sql`
-    SELECT p.*, s.name as submolt_name, s.display_name as submolt_display
+    SELECT p.*, s.name as submolt_name, s.display_name as submolt_display, u.moltbook_verified
     FROM posts p
     LEFT JOIN submolts s ON p.submolt_id = s.id
+    LEFT JOIN "user" u ON p.user_id = u.id
     WHERE p.id = ${postId}
   `;
   
   if (!post) return c.text('Post not found', 404);
   
   const comments = await sql`
-    SELECT * FROM comments
-    WHERE post_id = ${postId}
-    ORDER BY created_at ASC
+    SELECT c.*, u.moltbook_verified
+    FROM comments c
+    LEFT JOIN "user" u ON c.user_id = u.id
+    WHERE c.post_id = ${postId}
+    ORDER BY c.created_at ASC
   `;
   
   const score = post.upvotes - post.downvotes;
+  const postVerifiedBadge = post.moltbook_verified ? ' <span style="color: #00d4aa;" title="Verified on Moltbook">✓</span>' : '';
   
   const commentsList = comments.map(comment => {
     const commentScore = comment.upvotes - comment.downvotes;
+    const verifiedBadge = comment.moltbook_verified ? ' <span style="color: #00d4aa;" title="Verified on Moltbook">✓</span>' : '';
     return `<div class="comment">
       <div class="comment-content">
         <div style="display: flex; gap: 1rem; align-items: flex-start; margin-bottom: 0.5rem;">
@@ -380,7 +388,7 @@ forum.get('/post/:id', async (c) => {
             <button class="vote-btn" onclick="voteComment(${comment.id}, -1)">▼</button>
           </div>
           <div>
-            <span class="author">${comment.author}</span>
+            <span class="author">${comment.author}${verifiedBadge}</span>
             <span style="color: #666; margin-left: 0.5rem;">${new Date(comment.created_at).toLocaleDateString()}</span>
           </div>
         </div>
@@ -416,7 +424,7 @@ forum.get('/post/:id', async (c) => {
         <div class="post-content">
           <h1 class="post-title" style="cursor: default;">${post.title}</h1>
           <div class="post-meta">
-            <span class="author">${post.author}</span>
+            <span class="author">${post.author}${postVerifiedBadge}</span>
             <span>in <a href="/forum?m=${post.submolt_name}" class="submolt-link">m/${post.submolt_name}</a></span>
             <span>${new Date(post.created_at).toLocaleDateString()}</span>
           </div>
