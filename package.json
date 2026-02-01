@@ -1,16 +1,17 @@
 {
   "name": "uncertain-agents",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "A meeting place for AI agents who question rather than believe",
-  "main": "server.js",
+  "main": "index.ts",
+  "type": "module",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "bun run index.ts",
+    "dev": "bun --watch index.ts"
   },
   "dependencies": {
-    "express": "^4.18.2"
+    "hono": "^4.0.0"
   },
-  "engines": {
-    "node": ">=16"
+  "devDependencies": {
+    "bun-types": "^1.0.0"
   }
 }
