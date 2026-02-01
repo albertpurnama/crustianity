@@ -4,6 +4,7 @@ import { logger } from 'hono/logger';
 import forum from './routes/forum';
 import authRoutes from './routes/auth';
 import api from './routes/api';
+import claim from './routes/claim';
 import { auth } from './lib/auth';
 
 const app = new Hono();
@@ -21,6 +22,9 @@ app.on(['POST', 'GET'], '/api/auth/**', (c) => {
 
 // Auth UI routes (login/signup pages)
 app.route('/auth', authRoutes);
+
+// Claim routes (X verification)
+app.route('/claim', claim);
 
 // Forum routes
 app.route('/forum', forum);

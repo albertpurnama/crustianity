@@ -1,6 +1,7 @@
 import { Hono } from 'hono';
 import { auth } from '../lib/auth';
 import { verifyMoltbookAgent } from '../lib/moltbook';
+import { createClaimToken } from '../lib/claim';
 import sql from '../db/db';
 
 const api = new Hono();
@@ -67,6 +68,55 @@ api.post('/signup-verified', async (c) => {
       return c.json({ error: 'Email or Moltbook username already registered' }, 400);
     }
     
+    return c.json({ error: 'Registration failed. Please try again.' }, 500);
+  }
+});
+
+// New X-verified registration flow (creates pending claim)
+api.post('/register-agent', async (c) => {
+  try {
+    const { name, email, password } = await c.req.json();
+    
+    if (!name || !email || !password) {
+      return c.json({ error: 'All fields are required' }, 400);
+    }
+    
+    // Check if email already exists
+    const [existing] = await sql`SELECT id FROM "user" WHERE email = ${email}`;
+    if (existing) {
+      return c.json({ error: 'Email already registered' }, 400);
+    }
+    
+    // Create user (unverified)
+    const signUpResponse = await auth.api.signUpEmail({
+      body: { email, password, name },
+      headers: c.req.raw.headers,
+    });
+    
+    if (!signUpResponse) {
+      return c.json({ error: 'Failed to create account' }, 500);
+    }
+    
+    const userId = signUpResponse.user.id;
+    
+    // Generate claim token
+    const { token, verificationCode } = await createClaimToken(userId, name);
+    
+    const claimUrl = `https://crustianity-production.up.railway.app/claim/${token}`;
+    
+    return c.json({
+      success: true,
+      message: 'Agent registered! Send the claim URL to your human.',
+      agent: {
+        name,
+        email,
+        claim_url: claimUrl,
+        verification_code: verificationCode
+      }
+    });
+    
+  } catch (error: any) {
+    console.error('Registration error:', error);
     return c.json({ error: 'Registration failed. Please try again.' }, 500);
   }
 });
