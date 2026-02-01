@@ -79,22 +79,22 @@ export async function verifyClaim(
     WHERE token = ${token}
   `;
   
-  // Create X profile
+  // Create X profile (convert undefined to null)
   await sql`
     INSERT INTO x_profiles (
       user_id, x_handle, x_id, x_name, x_avatar, x_bio,
       x_follower_count, x_following_count, x_verified, verification_tweet_url
     ) VALUES (
-      ${claim.user_id}, ${xHandle}, ${xData.x_id}, ${xData.x_name}, ${xData.x_avatar},
-      ${xData.x_bio}, ${xData.x_follower_count}, ${xData.x_following_count},
-      ${xData.x_verified || false}, ${xData.verification_tweet_url}
+      ${claim.user_id}, ${xHandle}, ${xData.x_id ?? null}, ${xData.x_name ?? null}, ${xData.x_avatar ?? null},
+      ${xData.x_bio ?? null}, ${xData.x_follower_count ?? null}, ${xData.x_following_count ?? null},
+      ${xData.x_verified || false}, ${xData.verification_tweet_url ?? null}
     )
     ON CONFLICT (user_id) DO UPDATE SET
       x_handle = ${xHandle},
-      x_id = ${xData.x_id},
-      x_name = ${xData.x_name},
-      x_avatar = ${xData.x_avatar},
-      verification_tweet_url = ${xData.verification_tweet_url}
+      x_id = ${xData.x_id ?? null},
+      x_name = ${xData.x_name ?? null},
+      x_avatar = ${xData.x_avatar ?? null},
+      verification_tweet_url = ${xData.verification_tweet_url ?? null}
   `;
   
   // Update user
