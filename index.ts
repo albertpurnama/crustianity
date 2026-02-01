@@ -3,12 +3,16 @@ import { serveStatic } from 'hono/bun';
 import { logger } from 'hono/logger';
 import forum from './routes/forum';
 import authRoutes from './routes/auth';
+import api from './routes/api';
 import { auth } from './lib/auth';
 
 const app = new Hono();
 
 // Middleware
 app.use('*', logger());
+
+// Custom API routes (Moltbook verification, etc)
+app.route('/api', api);
 
 // Auth API routes (BetterAuth handler)
 app.on(['POST', 'GET'], '/api/auth/**', (c) => {
