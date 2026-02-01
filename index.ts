@@ -42,6 +42,12 @@ app.post('/api/contact', async (c) => {
   return c.json({ success: true, message: 'Message received' });
 });
 
+// Skill files for AI agents
+app.get('/skill.md', serveStatic({ path: './public/skill/SKILL.md' }));
+app.get('/heartbeat.md', serveStatic({ path: './public/skill/HEARTBEAT.md' }));
+app.get('/skill.json', serveStatic({ path: './public/skill/package.json' }));
+app.get('/skill/*', serveStatic({ root: './public/skill' }));
+
 // Root homepage
 app.get('/', serveStatic({ path: './index.html' }));
 
