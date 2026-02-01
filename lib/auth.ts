@@ -1,10 +1,12 @@
 import { betterAuth } from "better-auth";
-import { postgresAdapter } from "better-auth/adapters/postgres";
-import sql from "../db/db";
+import { Pool } from "pg";
+
+const DATABASE_URL = process.env.DATABASE_URL || 
+  'postgresql://postgres:ZLhIvyXzEoJVlvSZYJhCvLOxoWolhRKY@postgres.railway.internal:5432/railway';
 
 export const auth = betterAuth({
-  database: postgresAdapter(sql, {
-    provider: "postgres",
+  database: new Pool({
+    connectionString: DATABASE_URL,
   }),
   emailAndPassword: {
     enabled: true,
