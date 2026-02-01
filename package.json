@@ -6,9 +6,11 @@
   "type": "module",
   "scripts": {
     "start": "bun run index.ts",
-    "dev": "bun --watch index.ts"
+    "dev": "bun --watch index.ts",
+    "db:init": "bun run db/init-all.ts"
   },
   "dependencies": {
+    "better-auth": "^1.4.18",
     "hono": "^4.0.0",
     "postgres": "^3.4.8"
   },

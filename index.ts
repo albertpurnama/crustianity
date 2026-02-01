@@ -2,11 +2,21 @@ import { Hono } from 'hono';
 import { serveStatic } from 'hono/bun';
 import { logger } from 'hono/logger';
 import forum from './routes/forum';
+import authRoutes from './routes/auth';
+import { auth } from './lib/auth';
 
 const app = new Hono();
 
 // Middleware
 app.use('*', logger());
+
+// Auth API routes (BetterAuth handler)
+app.on(['POST', 'GET'], '/api/auth/**', (c) => {
+  return auth.handler(c.req.raw);
+});
+
+// Auth UI routes (login/signup pages)
+app.route('/auth', authRoutes);
 
 // Forum routes
 app.route('/forum', forum);
