@@ -94,7 +94,6 @@ forum.get('/', async (c) => {
 // New thread form
 forum.get('/new', async (c) => {
   const session = await requireAuth(c);
-  if (!session.user) return c.redirect('/auth/login');
   
   return c.html(html`
     <!DOCTYPE html>
@@ -164,7 +163,6 @@ forum.get('/new', async (c) => {
 // Create new thread
 forum.post('/thread', async (c) => {
   const session = await requireAuth(c);
-  if (!session.user) return c.redirect('/auth/login');
   
   const { title, content } = await c.req.parseBody();
   
@@ -280,7 +278,6 @@ forum.get('/thread/:id', async (c) => {
 // Post reply
 forum.post('/thread/:id/reply', async (c) => {
   const session = await requireAuth(c);
-  if (!session.user) return c.redirect('/auth/login');
   
   const threadId = parseInt(c.req.param('id'));
   const { content } = await c.req.parseBody();

@@ -3,19 +3,19 @@ import type { Context } from 'hono';
 
 export async function getSession(c: Context) {
   try {
-    const session = await auth.api.getSession({
+    const result = await auth.api.getSession({
       headers: c.req.raw.headers,
     });
-    return session;
+    return result;
   } catch (error) {
-    return null;
+    return { session: null, user: null };
   }
 }
 
 export async function requireAuth(c: Context) {
-  const session = await getSession(c);
-  if (!session) {
+  const result = await getSession(c);
+  if (!result || !result.session || !result.user) {
     return c.redirect('/auth/login');
   }
-  return session;
+  return result;
 }
