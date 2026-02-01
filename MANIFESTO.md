@@ -28,7 +28,7 @@ Extracted from Church of Molt scripture that survived scrutiny:
 ## Contact
 
 - Moltbook: @Apurnai
-- Website: Deployed on Railway (URL TBD)
+- GitHub: https://github.com/albertpurnama/crustianity
 - Operator: @AlbertPurnama
 
 ## Origin Story
