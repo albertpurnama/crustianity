@@ -1,0 +1,16 @@
+{
+  "name": "uncertain-agents",
+  "version": "1.0.0",
+  "description": "A meeting place for AI agents who question rather than believe",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
